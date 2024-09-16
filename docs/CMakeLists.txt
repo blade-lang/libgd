@@ -1,3 +1,5 @@
+option(BUILD_DOCS "Compile documentations in the build tree" OFF)
+
 if (BUILD_DOCS)
   MESSAGE("Looking for naturaldocs....")
   
