@@ -1,3 +1,5 @@
+option(BUILD_EXAMPLES "Compile examples in the build tree and enable ctest" OFF)
+
 if (BUILD_EXAMPLES)
 	include_directories (BEFORE "${GD_SOURCE_DIR}/src" "${CMAKE_BINARY_DIR}")
 	
