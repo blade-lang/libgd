@@ -3,8 +3,6 @@ project(GD)
 SET(PACKAGE GD)
 SET(PACKAGE_NAME GD)
 
-
-
 SET(CMAKE_MODULE_PATH "${GD_SOURCE_DIR}/cmake/modules")
 
 include(gd)
@@ -45,28 +43,37 @@ IF(CMAKE_COMPILER_IS_GNUCC)
   	SET(CMAKE_C_FLAGS_DEBUG "-g -Wall -Wextra -O0 ") # will be added to CMAKE_C_FLAGS when CMAKE_BUILD_TYPE is Debug
   endif (ENABLE_ASAN)
 ENDIF(CMAKE_COMPILER_IS_GNUCC)
-SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY
-  ${PROJECT_BINARY_DIR}/Bin
-  CACHE PATH
-  "Single Directory for all Libraries"
-  )
 
 # ---------- Backup output directory --------------------------
 SET(ORIGINAL_RUNTIME_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+SET(ORIGINAL_LIBRARY_DIR ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+SET(ORIGINAL_ARCHIVE_DIR ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
+
+#IF(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+	SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY
+	  ${PROJECT_BINARY_DIR}/Bin
+	  CACHE PATH
+	  "Single Directory for all Libraries"
+	  )
+#ENDIF()
 
 # --------- Setup the Executable output Directory -------------
-SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY
-  ${PROJECT_BINARY_DIR}/Bin
-  CACHE PATH
-  "Single Directory for all Executables."
-  )
+#IF(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+	SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY
+	  ${PROJECT_BINARY_DIR}/Bin
+	  CACHE PATH
+	  "Single Directory for all Executables."
+	  )
+#ENDIF()
 
 # --------- Setup the Executable output Directory -------------
-SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY
-  ${PROJECT_BINARY_DIR}/Bin
-  CACHE PATH
-  "Single Directory for all static libraries."
-  )
+#IF(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+	SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY
+	  ${PROJECT_BINARY_DIR}/Bin
+	  CACHE PATH
+	  "Single Directory for all static libraries."
+	  )
+#ENDIF()
 
 SET(PKG_REQUIRES_PRIVATES "")
 
@@ -308,5 +315,7 @@ add_subdirectory(docs)
 add_custom_target(distclean ${GD_SOURCE_DIR}/cmake/distclean.sh)
 
 
-# ---------- Restore output directory --------------------------
+# ---------- Restore output directory -------------------------
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${ORIGINAL_LIBRARY_DIR})
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${ORIGINAL_RUNTIME_DIR})
+SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${ORIGINAL_ARCHIVE_DIR})
