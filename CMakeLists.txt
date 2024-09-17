@@ -51,6 +51,9 @@ SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY
   "Single Directory for all Libraries"
   )
 
+# ---------- Backup output directory --------------------------
+SET(ORIGINAL_RUNTIME_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+
 # --------- Setup the Executable output Directory -------------
 SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY
   ${PROJECT_BINARY_DIR}/Bin
@@ -303,3 +306,7 @@ add_subdirectory(examples)
 add_subdirectory(docs)
 
 add_custom_target(distclean ${GD_SOURCE_DIR}/cmake/distclean.sh)
+
+
+# ---------- Restore output directory --------------------------
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${ORIGINAL_RUNTIME_DIR})
