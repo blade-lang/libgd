@@ -306,6 +306,10 @@ else (USE_EXT_GD)
 	INCLUDE_DIRECTORIES(before ${FONTCONFIG_INCLUDE_DIR})
 
 	add_subdirectory(src)
+
+ 	MARK_AS_ADVANCED(
+	  GD_INCLUDE_DIR
+	)
 endif (USE_EXT_GD)
 
 add_subdirectory(tests)
