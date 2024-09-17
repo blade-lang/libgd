@@ -1,3 +1,5 @@
+option(BUILD_PROGRAMS_LIB "Compile the gd program libraries" OFF)
+
 SET (LIBGD_SRC_FILES
 	gd.c
 	gd_avif.c
@@ -150,18 +152,20 @@ if (ZLIB_FOUND)
 	set(GD_PROGRAMS ${GD_PROGRAMS} gd2copypal gd2togif giftogd2)
 endif()
 
-foreach(program ${GD_PROGRAMS})
-    add_executable(${program} ${program}.c)
+if(BUILD_PROGRAMS_LIB)
+	foreach(program ${GD_PROGRAMS})
+		add_executable(${program} ${program}.c)
 
-    if (BUILD_SHARED_LIBS)
-        target_link_libraries(${program} ${GD_LIB})
-    else()
-        target_link_libraries(${program} ${GD_LIB_STATIC})
-    endif()
-	if (NOT "${GD_PROGRAMS_LIB_SRC_FILES}" STREQUAL "")
-		target_link_libraries(${program} gd_programs_lib)
-	endif()
-endforeach(program)
+		if (BUILD_SHARED_LIBS)
+			target_link_libraries(${program} ${GD_LIB})
+		else()
+			target_link_libraries(${program} ${GD_LIB_STATIC})
+		endif()
+		if (NOT "${GD_PROGRAMS_LIB_SRC_FILES}" STREQUAL "")
+			target_link_libraries(${program} gd_programs_lib)
+		endif()
+	endforeach(program)
+endif()
 
 set(GD_INSTALL_TARGETS ${GD_PROGRAMS})
 if (BUILD_SHARED_LIBS)
@@ -171,11 +175,14 @@ if (BUILD_STATIC_LIBS)
 	set(GD_INSTALL_TARGETS ${GD_INSTALL_TARGETS} ${GD_LIB_STATIC})
 endif()
 
-install(TARGETS ${GD_INSTALL_TARGETS}
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-install(PROGRAMS bdftogd DESTINATION bin)
+if(BUILD_PROGRAMS_LIB)
+	install(TARGETS ${GD_INSTALL_TARGETS}
+			RUNTIME DESTINATION bin
+			LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+			ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+	install(PROGRAMS bdftogd DESTINATION bin)
+endif()
+
 install(FILES
 	gd.h
 	gd_color_map.h

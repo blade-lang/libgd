@@ -23,6 +23,7 @@ OPTION(ENABLE_RAQM "Enable RAQM support" 0)
 OPTION(ENABLE_ASAN "Enable (gcc) ASAN support" 0)
 OPTION(ENABLE_CPP "Enable CPP GD API" 1)
 OPTION(VERBOSE_MAKEFILE "Enable CMAKE_VERBOSE_MAKEFILE" 0)
+option(OVERRIDE_CMAKE_PATHS "Override CMake runtime, archive and library paths" OFF)
 
 if (VERBOSE_MAKEFILE)
 	set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -44,36 +45,39 @@ IF(CMAKE_COMPILER_IS_GNUCC)
   endif (ENABLE_ASAN)
 ENDIF(CMAKE_COMPILER_IS_GNUCC)
 
-# ---------- Backup output directory --------------------------
-SET(ORIGINAL_RUNTIME_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-SET(ORIGINAL_LIBRARY_DIR ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
-SET(ORIGINAL_ARCHIVE_DIR ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
+if(OVERRIDE_CMAKE_PATHS)
 
-IF(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
-	SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY
-	  ${PROJECT_BINARY_DIR}/Bin
-	  CACHE PATH
-	  "Single Directory for all Libraries"
-	  )
-ENDIF()
+	# ---------- Backup output directory --------------------------
+	SET(ORIGINAL_RUNTIME_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+	SET(ORIGINAL_LIBRARY_DIR ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+	SET(ORIGINAL_ARCHIVE_DIR ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
 
-# --------- Setup the Executable output Directory -------------
-IF(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-	SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY
-	  ${PROJECT_BINARY_DIR}/Bin
-	  CACHE PATH
-	  "Single Directory for all Executables."
-	  )
-ENDIF()
+	IF(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+		SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY
+			${CMAKE_CURRENT_BINARY_DIR}/Bin
+			PATH
+			"Single Directory for all Libraries"
+			)
+	ENDIF()
 
-# --------- Setup the Executable output Directory -------------
-IF(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
-	SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY
-	  ${PROJECT_BINARY_DIR}/Bin
-	  CACHE PATH
-	  "Single Directory for all static libraries."
-	  )
-ENDIF()
+	# --------- Setup the Executable output Directory -------------
+	IF(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+		SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY
+			${CMAKE_CURRENT_BINARY_DIR}/Bin
+			PATH
+			"Single Directory for all Executables."
+			)
+	ENDIF()
+
+	# --------- Setup the Executable output Directory -------------
+	IF(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+		SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY
+			${CMAKE_CURRENT_BINARY_DIR}/Bin
+			PATH
+			"Single Directory for all static libraries."
+			)
+	ENDIF()
+endif()
 
 SET(PKG_REQUIRES_PRIVATES "")
 
@@ -306,10 +310,6 @@ else (USE_EXT_GD)
 	INCLUDE_DIRECTORIES(before ${FONTCONFIG_INCLUDE_DIR})
 
 	add_subdirectory(src)
-
- 	MARK_AS_ADVANCED(
-	  GD_INCLUDE_DIR
-	)
 endif (USE_EXT_GD)
 
 add_subdirectory(tests)
@@ -319,7 +319,9 @@ add_subdirectory(docs)
 add_custom_target(distclean ${GD_SOURCE_DIR}/cmake/distclean.sh)
 
 
-# ---------- Restore output directory -------------------------
-SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${ORIGINAL_LIBRARY_DIR})
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${ORIGINAL_RUNTIME_DIR})
-SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${ORIGINAL_ARCHIVE_DIR})
+if(OVERRIDE_CMAKE_PATHS)
+	# ---------- Restore output directory -------------------------
+	SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${ORIGINAL_LIBRARY_DIR})
+	SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${ORIGINAL_RUNTIME_DIR})
+	SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${ORIGINAL_ARCHIVE_DIR})
+endif()
